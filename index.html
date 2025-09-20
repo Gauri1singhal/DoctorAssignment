@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Registration App</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .phone-container {
+        width: 375px;
+        height: 667px;
+        background: white;
+        border-radius: 25px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .screen {
+        display: none;
+        height: 100%;
+        overflow-y: auto;
+      }
+
+      .screen.active {
+        display: block;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 20px 20px;
+        text-align: center;
+        position: relative;
+      }
+
+      .back-btn {
+        position: absolute;
+        left: 20px;
+        top: 45px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+      }
+
+      .header h1 {
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .header p {
+        margin-top: 8px;
+        opacity: 0.9;
+        font-size: 14px;
+      }
+
+      .form-container {
+        padding: 30px 20px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e1e5e9;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .gender-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .gender-option {
+        flex: 1;
+        padding: 15px;
+        border: 2px solid #e1e5e9;
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .gender-option.selected {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+      }
+
+      .age-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .age-input {
+        flex: 2;
+      }
+
+      .age-unit {
+        flex: 1;
+      }
+
+      .submit-btn {
+        width: 100%;
+        padding: 18px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: transform 0.2s;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .submit-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .doctor-list {
+        padding: 20px;
+      }
+
+      .doctor-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #667eea;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .doctor-card:hover {
+        transform: translateY(-2px);
+      }
+
+      .doctor-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+      }
+
+      .doctor-info {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+
+      .dashboard {
+        background: white;
+        height: 100%;
+      }
+
+      .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 20px 30px;
+        text-align: center;
+        border-radius: 0 0 30px 30px;
+      }
+
+      .doctor-avatar {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        margin: 0 auto 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+      }
+
+      .dashboard-content {
+        padding: 30px 20px;
+      }
+
+      .info-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+      }
+
+      .info-label {
+        font-size: 12px;
+        color: #666;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+      }
+
+      .info-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .navigation {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        z-index: 1000;
+      }
+
+      .nav-btn {
+        padding: 10px 20px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+      }
+
+      .error {
+        background: #fee;
+        color: #d33;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        border-left: 4px solid #d33;
+      }
+
+      .success {
+        background: #efe;
+        color: #393;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        border-left: 4px solid #393;
+      }
+
+      @media (max-width: 400px) {
+        .phone-container {
+          width: 100%;
+          height: 100vh;
+          border-radius: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="phone-container">
+      <!-- Registration Screen -->
+      <div class="screen active" id="registration">
+        <div class="header">
+          <h1>Doctor Registration</h1>
+          <p>Create your professional profile</p>
+        </div>
+        <div class="form-container">
+          <form id="registrationForm">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input
+                type="text"
+                id="name"
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input
+                type="tel"
+                id="phoneNo"
+                placeholder="Enter phone number"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>WhatsApp Number</label>
+              <input
+                type="tel"
+                id="whatsappNo"
+                placeholder="Enter WhatsApp number"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Email Address</label>
+              <input
+                type="email"
+                id="email"
+                placeholder="Enter email address"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Gender</label>
+              <div class="gender-group">
+                <div class="gender-option" data-value="M">Male</div>
+                <div class="gender-option" data-value="F">Female</div>
+              </div>
+              <input type="hidden" id="gender" />
+            </div>
+
+            <div class="form-group">
+              <label>Age</label>
+              <div class="age-group">
+                <input
+                  type="number"
+                  id="age"
+                  class="age-input"
+                  placeholder="Age"
+                  min="1"
+                  max="100"
+                  required
+                />
+                <select id="ageUnit" class="age-unit">
+                  <option value="Y">Years</option>
+                  <option value="M">Months</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+              Register Doctor
+            </button>
+          </form>
+          <div id="message"></div>
+        </div>
+      </div>
+
+      <!-- Doctor List Screen -->
+      <div class="screen" id="doctorList">
+        <div class="header">
+          <button class="back-btn" onclick="showScreen('registration')">
+            &larr;
+          </button>
+          <h1>All Doctors</h1>
+          <p>Registered doctors list</p>
+        </div>
+        <div class="doctor-list" id="doctorListContent">
+          <div class="loading">Loading doctors...</div>
+        </div>
+      </div>
+
+      <!-- Dashboard Screen -->
+      <div class="screen" id="dashboard">
+        <div class="dashboard">
+          <div class="dashboard-header">
+            <button class="back-btn" onclick="showScreen('doctorList')">
+              &larr;
+            </button>
+            <div class="doctor-avatar">👨‍⚕️</div>
+            <h2 id="dashboardName">Doctor Name</h2>
+            <p>Medical Professional</p>
+          </div>
+          <div class="dashboard-content" id="dashboardContent">
+            <div class="loading">Loading doctor details...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <button class="nav-btn" onclick="showScreen('registration')">
+        Register
+      </button>
+      <button class="nav-btn" onclick="showScreen('doctorList')">List</button>
+    </div>
+
+    <script>
+      let doctors = [];
+      let selectedGender = "";
+      let demoDatabase = []; // In-memory storage for demo
+
+      // Gender selection
+      document.querySelectorAll(".gender-option").forEach((option) => {
+        option.addEventListener("click", function () {
+          document
+            .querySelectorAll(".gender-option")
+            .forEach((o) => o.classList.remove("selected"));
+          this.classList.add("selected");
+          selectedGender = this.dataset.value;
+          document.getElementById("gender").value = selectedGender;
+        });
+      });
+
+      // Auto-fill WhatsApp with phone number
+      document.getElementById("phoneNo").addEventListener("input", function () {
+        const whatsappField = document.getElementById("whatsappNo");
+        if (!whatsappField.value) {
+          whatsappField.value = this.value;
+        }
+      });
+
+      // Form submission
+      document
+        .getElementById("registrationForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          if (!selectedGender) {
+            showMessage("Please select a gender", "error");
+            return;
+          }
+
+          const submitBtn = document.getElementById("submitBtn");
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Registering...";
+
+          const formData = {
+            Name: document.getElementById("name").value,
+            NameUpper: document.getElementById("name").value.toUpperCase(),
+            PhoneNo: document.getElementById("phoneNo").value,
+            WhatsappNo: document.getElementById("whatsappNo").value,
+            CountryCode: "IN",
+            Email: document.getElementById("email").value,
+            Gender: selectedGender,
+            Age: document.getElementById("age").value,
+            AgeUnit: document.getElementById("ageUnit").value,
+          };
+
+          // Simulate API call for demo purposes
+          setTimeout(() => {
+            // Add to demo doctors list
+            const newDoctor = {
+              DoctorId: "guid-" + Date.now(),
+              Name: formData.Name,
+              Email: formData.Email,
+              Gender: formData.Gender,
+              PhoneNo: formData.PhoneNo,
+              WhatsappNo: formData.WhatsappNo,
+              Age: formData.Age,
+              AgeUnit: formData.AgeUnit,
+              CountryCode: formData.CountryCode,
+            };
+
+            // Store in demo database
+            demoDatabase.push(newDoctor);
+
+            showMessage(
+              "✅ Doctor registered successfully! (Demo Mode)",
+              "success"
+            );
+            document.getElementById("registrationForm").reset();
+            selectedGender = "";
+            document
+              .querySelectorAll(".gender-option")
+              .forEach((o) => o.classList.remove("selected"));
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Register Doctor";
+
+            // Auto-navigate to doctor list after 2 seconds
+            setTimeout(() => {
+              loadDoctors();
+              showScreen("doctorList");
+            }, 2000);
+          }, 1500);
+        });
+
+      // Load doctors list
+      function loadDoctors() {
+        const content = document.getElementById("doctorListContent");
+        content.innerHTML = '<div class="loading">Loading doctors...</div>';
+
+        setTimeout(() => {
+          // Get demo data and combine with sample data
+          let allDoctors = [...demoDatabase];
+
+          // Add some sample doctors if no demo data exists
+          if (allDoctors.length === 0) {
+            allDoctors = [
+              {
+                DoctorId: "sample-guid-001",
+                Name: "Dr. Priya Sharma",
+                Email: "priya.sharma@hospital.com",
+                Gender: "F",
+                PhoneNo: "9876543210",
+                WhatsappNo: "9876543210",
+                Age: "32",
+                AgeUnit: "Y",
+                CountryCode: "IN",
+              },
+              {
+                DoctorId: "sample-guid-002",
+                Name: "Dr. Rajesh Kumar",
+                Email: "rajesh.kumar@clinic.com",
+                Gender: "M",
+                PhoneNo: "8765432109",
+                WhatsappNo: "8765432109",
+                Age: "45",
+                AgeUnit: "Y",
+                CountryCode: "IN",
+              },
+              {
+                DoctorId: "sample-guid-003",
+                Name: "Dr. Anita Mehta",
+                Email: "anita.mehta@medical.com",
+                Gender: "F",
+                PhoneNo: "7654321098",
+                WhatsappNo: "7654321098",
+                Age: "38",
+                AgeUnit: "Y",
+                CountryCode: "IN",
+              },
+            ];
+          }
+
+          doctors = allDoctors;
+          displayDoctors(doctors);
+        }, 800);
+      }
+
+      // Display doctors in list
+      function displayDoctors(doctorsList) {
+        const content = document.getElementById("doctorListContent");
+
+        if (doctorsList.length === 0) {
+          content.innerHTML =
+            '<div class="loading">No doctors found. Register a new doctor first.</div>';
+          return;
+        }
+
+        const doctorsHtml = doctorsList
+          .map(
+            (doctor) => `
+                <div class="doctor-card" onclick="viewDoctorDetails('${
+                  doctor.DoctorId || doctor.Id || "sample-guid"
+                }', '${doctor.Name}')">
+                    <div class="doctor-name">${doctor.Name}</div>
+                    <div class="doctor-info">📧 ${doctor.Email}</div>
+                    <div class="doctor-info">👤 ${
+                      doctor.Gender === "M" ? "Male" : "Female"
+                    }</div>
+                    <div class="doctor-info">📞 ${doctor.PhoneNo}</div>
+                    <div class="doctor-info">🎂 ${doctor.Age} ${
+              doctor.AgeUnit === "Y" ? "Years" : "Months"
+            } old</div>
+                </div>
+            `
+          )
+          .join("");
+
+        content.innerHTML = doctorsHtml;
+      }
+
+      // View doctor details
+      function viewDoctorDetails(doctorId, doctorName) {
+        showScreen("dashboard");
+        document.getElementById("dashboardName").textContent = doctorName;
+        const content = document.getElementById("dashboardContent");
+        content.innerHTML =
+          '<div class="loading">Loading doctor details...</div>';
+
+        setTimeout(() => {
+          // Find doctor in demo data
+          let allDoctors = [...demoDatabase];
+
+          // Add sample data if needed
+          if (allDoctors.length === 0) {
+            allDoctors = [
+              {
+                DoctorId: "sample-guid-001",
+                Name: "Dr. Priya Sharma",
+                Email: "priya.sharma@hospital.com",
+                Gender: "F",
+                PhoneNo: "9876543210",
+                WhatsappNo: "9876543210",
+                Age: "32",
+                AgeUnit: "Y",
+                CountryCode: "IN",
+              },
+              {
+                DoctorId: "sample-guid-002",
+                Name: "Dr. Rajesh Kumar",
+                Email: "rajesh.kumar@clinic.com",
+                Gender: "M",
+                PhoneNo: "8765432109",
+                WhatsappNo: "8765432109",
+                Age: "45",
+                AgeUnit: "Y",
+                CountryCode: "IN",
+              },
+              {
+                DoctorId: "sample-guid-003",
+                Name: "Dr. Anita Mehta",
+                Email: "anita.mehta@medical.com",
+                Gender: "F",
+                PhoneNo: "7654321098",
+                WhatsappNo: "7654321098",
+                Age: "38",
+                AgeUnit: "Y",
+                CountryCode: "IN",
+              },
+            ];
+          }
+
+          let doctor = allDoctors.find((d) => d.DoctorId === doctorId);
+          if (!doctor) {
+            doctor = allDoctors[0]; // fallback to first doctor
+          }
+
+          displayDoctorDetails(doctor);
+        }, 600);
+      }
+
+      // Display doctor details in dashboard
+      function displayDoctorDetails(doctor) {
+        const content = document.getElementById("dashboardContent");
+        content.innerHTML = `
+                <div class="info-card">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value">${doctor.Name}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Email Address</div>
+                    <div class="info-value">${doctor.Email}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Phone Number</div>
+                    <div class="info-value">${doctor.PhoneNo}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">WhatsApp Number</div>
+                    <div class="info-value">${doctor.WhatsappNo}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Gender</div>
+                    <div class="info-value">${
+                      doctor.Gender === "M" ? "Male" : "Female"
+                    }</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Age</div>
+                    <div class="info-value">${doctor.Age} ${
+          doctor.AgeUnit === "Y" ? "Years" : "Months"
+        }</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Country</div>
+                    <div class="info-value">${doctor.CountryCode}</div>
+                </div>
+            `;
+      }
+
+      // Show message
+      function showMessage(text, type) {
+        const messageEl = document.getElementById("message");
+        messageEl.className = type;
+        messageEl.textContent = text;
+        setTimeout(() => {
+          messageEl.textContent = "";
+          messageEl.className = "";
+        }, 5000);
+      }
+
+      // Screen navigation
+      function showScreen(screenId) {
+        document.querySelectorAll(".screen").forEach((screen) => {
+          screen.classList.remove("active");
+        });
+        document.getElementById(screenId).classList.add("active");
+
+        if (screenId === "doctorList") {
+          loadDoctors();
+        }
+      }
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("Doctor Registration App Loaded");
+      });
+    </script>
+  </body>
+</html>
